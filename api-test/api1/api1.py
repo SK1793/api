@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import pickle 
+import csv
+import json
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -39,7 +41,7 @@ model = pickle.load(open('model.pkl','rb'))
 app = Flask(__name__)
 @app.route('/')
 def index():
-    return "Hello world"
+    return "Hello world!"
 @app.route('/predict',methods=['POST'])
 def predict():
     cgpa = request.form.get('cgpa')
@@ -48,6 +50,35 @@ def predict():
     input_query = np.array([[cgpa,iq,profile_score]])
     result = model.predict(input_query)[0]
     return jsonify({'placement':str(result)})
+
+@app.route('/display')
+
+
+def display():
+    csvFilePath="students_placement.csv"
+    jsonFilePath="api1.json"
+
+    jsonArray = []
+      
+    #read csv file
+    with open(csvFilePath, encoding='utf-8') as csvf: 
+        #load csv file data using csv library's dictionary reader
+        csvReader = csv.DictReader(csvf) 
+
+        #convert each csv row into python dict
+        for row in csvReader: 
+            #add this python dict to json array
+            jsonArray.append(row)
+  
+    #convert python jsonArray to JSON String and write to file
+    with open(jsonFilePath, 'w', encoding='utf-8') as jsonf: 
+        jsonString = json.dumps(jsonArray, indent=4)
+        jsonf.write(jsonString)
+          
+        with open(jsonFilePath) as f:
+            json_data = json.load(f)
+    return json_data
+
 if __name__ == '__main__':
     app.run(debug=True)
     
