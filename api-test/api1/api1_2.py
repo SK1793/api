@@ -13,6 +13,7 @@ def predict():
     profile_score = request.form.get('profile_score')
     input_query = np.array([[cgpa,iq,profile_score]])
     result = model.predict(input_query)[0]
-    return jsonify({'placement':str(result)})
+    placement=jsonify({'placement':str(result)})
+    return placement
 if __name__ == '__main__':
     app.run(debug=True)
